@@ -46,8 +46,8 @@ El script sigue una estructura típica de una aplicación Dash:
 ### 3.1. Carga de Datos y Modelos
 
 * **`df = pd.read_csv('2023_nba_player_stats.csv')`**: Carga las estadísticas crudas de los jugadores.
-* **`df = renameDatabase(df)`**: Aplica una función (presumiblemente para limpiar o estandarizar nombres de columnas) al DataFrame principal.
-* **`model_data = pd.read_csv('database.csv')`**: Carga un conjunto de datos que parece ser el utilizado para entrenar o evaluar los modelos.
+* **`df = renameDatabase(df)`**: Aplica una función de renombramiento al DataFrame principal.
+* **`model_data = pd.read_csv('database.csv')`**: Carga un conjunto el conjunto de datos para entrenar o evaluar los modelos.
 * **`results_df = pd.read_csv('Model comparison results.csv')`**: Carga un CSV con los resultados de la comparación de diferentes modelos de ML.
 * **`trained_models = joblib.load('models/top_three_models.pkl')`**: Carga un diccionario o lista de modelos de scikit-learn pre-entrenados.
 * **`model_features = joblib.load('models/model_features.pkl')`**: Carga una lista de las características (nombres de columnas) que los modelos esperan como entrada.
