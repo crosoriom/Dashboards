@@ -103,7 +103,7 @@ Ambos son excelentes y la elección a menudo depende de los requisitos específi
 
 Veamos los pasos generales para crear un dashboard, con ejemplos para Dash y Streamlit.
 
-La sección [4.1] detalla los pasos a seguir si vas a desarrollar tu dashboard de manera local, es decir, programarás desde tu computadora. Si trabajarás en un entorno de Cloud (Por ejemplo [Google Colab](https://colab.research.google.com/) o [Kaggle](https://kaggle.com/)) dirígete a la sección [4.2]
+La sección [4.1](#41-pasos-iniciales-para-ambos-frameworks---trabajo-en-modo-local) detalla los pasos a seguir si vas a desarrollar tu dashboard de manera local, es decir, programarás desde tu computadora. Si trabajarás en un entorno de Cloud (Por ejemplo [Google Colab](https://colab.research.google.com/) o [Kaggle](https://kaggle.com/)) dirígete a la sección [4.2](#42-pasos-iniciales-para-ambos-frameworks---trabajo-en-entornos-cloud).
 
 ### 4.1. Pasos Iniciales (Para Ambos Frameworks - Trabajo en modo local)
 
@@ -159,6 +159,69 @@ La sección [4.1] detalla los pasos a seguir si vas a desarrollar tu dashboard d
         # Manejar el error
     ```
 
+### 4.2. Pasos Iniciales (Para Ambos Frameworks - Trabajo en Entornos Cloud)
+
+Si estás utilizando un entorno de desarrollo basado en la nube como Google Colab o Kaggle Notebooks, la configuración es ligeramente diferente, principalmente en cómo se instalan las bibliotecas y se manejan los archivos.
+
+1.  **Instalar Bibliotecas:**
+    * En estos entornos, generalmente instalas bibliotecas usando `!pip install`. No necesitas crear ni activar entornos virtuales de la misma manera que lo harías localmente.
+        ```python
+        # En una celda de código de Colab/Kaggle
+        !pip install pandas plotly dash dash-bootstrap-components streamlit scikit-learn joblib
+        ```
+    * Ejecuta esta celda para instalar las dependencias en tu sesión actual del notebook.
+
+2.  **Subir y Acceder a Archivos de Datos y Modelos:**
+    * **Google Colab:**
+        * Puedes subir archivos directamente usando el panel "Archivos" a la izquierda.
+        * También puedes montar tu Google Drive para acceder a archivos almacenados allí:
+            ```python
+            from google.colab import drive
+            drive.mount('/content/drive')
+            # Ahora puedes acceder a tus archivos, por ejemplo:
+            # df = pd.read_csv('/content/drive/MyDrive/tu_carpeta/tus_datos.csv')
+            ```
+    * **Kaggle Notebooks:**
+        * Puedes añadir datasets a tu notebook desde la sección "Data" -> "+ Add data".
+        * Los archivos subidos o datasets añadidos estarán disponibles en rutas como `../input/nombre_del_dataset/archivo.csv`.
+
+3.  **Preparar tus Datos y Cargar Modelos:**
+    * El código para cargar datos con Pandas (`pd.read_csv()`) y modelos con `joblib.load()` es el mismo, pero **debes asegurarte de que las rutas a los archivos sean correctas** según cómo los hayas subido o montado en el entorno cloud.
+        ```python
+        import pandas as pd
+        import joblib
+
+        # Ejemplo para Colab (asumiendo archivos subidos a la sesión o Drive)
+        try:
+            # df = pd.read_csv('tus_datos.csv') # Si subiste directamente
+            # df = pd.read_csv('/content/drive/MyDrive/tu_carpeta/tus_datos.csv') # Si está en Drive
+            # trained_models = joblib.load('/content/drive/MyDrive/tu_carpeta/modelos.pkl')
+            pass # Adapta las rutas
+        except FileNotFoundError:
+            print("Archivo no encontrado. Verifica la ruta en tu entorno Cloud.")
+
+        # Ejemplo para Kaggle (asumiendo un dataset añadido)
+        try:
+            # df = pd.read_csv('../input/nombre_del_dataset/tus_datos.csv')
+            # trained_models = joblib.load('../input/nombre_del_dataset/modelos.pkl')
+            pass # Adapta las rutas
+        except FileNotFoundError:
+            print("Archivo no encontrado. Verifica la ruta en tu entorno Kaggle.")
+        ```
+
+**Importante para ejecutar Dash/Streamlit en Entornos Cloud:**
+* **Dash en Colab/Kaggle:** Ejecutar aplicaciones Dash directamente en un notebook de Colab/Kaggle de forma interactiva como lo harías localmente requiere soluciones alternativas como `jupyter-dash` o exponer el servidor a través de ngrok (ver sección [5.2.2](#ngrok-para-exponer-apps-localescloud-temporalmente)).
+    ```python
+    # Para usar Dash en Colab/Kaggle con jupyter-dash
+    !pip install jupyter-dash
+    from jupyter_dash import JupyterDash
+    # ... luego en lugar de app = dash.Dash(...) usa:
+    # app = JupyterDash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+    # ... y para correrlo:
+    # app.run_server(mode='inline') # o 'external' o 'jupyterlab'
+    ```
+* **Streamlit en Colab/Kaggle:** Streamlit está diseñado para ejecutarse como un servidor independiente. Para ejecutar una app Streamlit desde Colab/Kaggle y acceder a ella desde tu navegador, necesitarás usar una herramienta como `ngrok` para crear un túnel público a tu servidor Streamlit que se ejecuta en la máquina virtual de Colab/Kaggle. La ejecución directa dentro de la celda del notebook no es el uso estándar de Streamlit.
+
 ### 4.3. Construyendo con Dash
 
 Un archivo típico de Dash (`app_dash.py`):
@@ -172,11 +235,13 @@ import pandas as pd
 # Importa joblib y otras bibliotecas si las necesitas para modelos o datos
 
 # 1. Carga y prepara tus datos (ej. df, model_data, results_df)
-# df = pd.read_csv('...')
+# df = pd.read_csv('...') # Asegúrate que la ruta es correcta para tu entorno
 # ... (código de carga de datos y modelos) ...
 
 # 2. Inicializa la aplicación Dash
-# external_stylesheets es opcional, dbc.themes.BOOTSTRAP es común para un buen look inicial
+# Si usas Colab/Kaggle, considera JupyterDash como se mencionó en la sección 4.2
+# from jupyter_dash import JupyterDash
+# app = JupyterDash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server # Necesario para algunas plataformas de despliegue
 
@@ -184,29 +249,28 @@ server = app.server # Necesario para algunas plataformas de despliegue
 app.layout = dbc.Container([
     html.H1("Título de mi Dashboard", style={'textAlign': 'center', 'margin': '20px'}),
 
-    # Ejemplo de Pestañas (Tabs)
     dcc.Tabs(id="tabs-principal", value='tab-1', children=[
         dcc.Tab(label='Vista General de Datos', value='tab-1', children=[
-            dbc.Row([ # dbc.Row y dbc.Col para organizar en filas y columnas
+            dbc.Row([
                 dbc.Col([
                     html.H3("Estadísticas Descriptivas"),
                     # dash_table.DataTable(
                     #     data=df.describe().reset_index().to_dict('records'),
                     #     columns=[{"name": i, "id": i} for i in df.describe().reset_index().columns]
-                    # ) # Descomentar si tienes 'df'
-                ], width=6), # width define el ancho de la columna (Bootstrap grid)
+                    # ) # Descomentar y asegurar que 'df' está cargado
+                ], width=6),
                 dbc.Col([
                     html.H3("Muestra de Datos"),
                     # dash_table.DataTable(
                     #     data=df.head().to_dict('records'),
                     #     columns=[{"name": i, "id": i} for i in df.columns]
-                    # ) # Descomentar si tienes 'df'
+                    # ) # Descomentar y asegurar que 'df' está cargado
                 ], width=6),
             ]),
             dbc.Row([
                 dbc.Col([
                     html.H4("Gráfico de Histograma"),
-                    # dcc.Graph(id='histograma-ejemplo') # Se llenará con un callback
+                    # dcc.Graph(id='histograma-ejemplo')
                 ], width=12)
             ])
         ]),
@@ -214,61 +278,50 @@ app.layout = dbc.Container([
             html.H3("Selector Interactivo"),
             dcc.Dropdown(
                 id='dropdown-selector',
-                # options=[{'label': i, 'value': i} for i in df.columns], # Descomentar si tienes 'df'
-                # value=df.columns[0] if not df.empty else None, # Descomentar
+                # options=[{'label': i, 'value': i} for i in df.columns],
+                # value=df.columns[0] if not df.empty else None,
                 style={'width': '50%'}
             ),
             dcc.Graph(id='grafico-interactivo')
         ]),
-        # Puedes añadir más pestañas para predicciones, etc.
     ]),
-], fluid=True) # fluid=True hace que el contenedor ocupe todo el ancho
+], fluid=True)
 
 # 4. Define los Callbacks para la interactividad
 # @app.callback(
 #     Output('histograma-ejemplo', 'figure'),
-#     [Input('tabs-principal', 'value')] # Un input simple, podría ser un botón, etc.
+#     [Input('tabs-principal', 'value')]
 # )
 # def actualizar_histograma(tab_seleccionada):
-#     if tab_seleccionada == 'tab-1' and not df.empty:
+#     if tab_seleccionada == 'tab-1' and 'df' in globals() and not df.empty:
 #         fig = px.histogram(df, x=df.columns[0], title='Histograma de Ejemplo')
 #         return fig
-#     return px.scatter() # Figura vacía o por defecto
+#     return {} # Retorna una figura vacía o un diccionario vacío
 
 # @app.callback(
 #     Output('grafico-interactivo', 'figure'),
 #     [Input('dropdown-selector', 'value')]
 # )
 # def actualizar_grafico_interactivo(columna_seleccionada):
-#     if columna_seleccionada and not df.empty:
-#         # Ejemplo: Gráfico de dispersión contra otra columna o un índice
+#     if columna_seleccionada and 'df' in globals() and not df.empty:
 #         fig = px.scatter(df, x=columna_seleccionada, y=df.columns[1] if len(df.columns) > 1 else None,
 #                          title=f'{columna_seleccionada} vs {df.columns[1] if len(df.columns) > 1 else "Index"}')
 #         return fig
-#     return px.scatter()
-
-# ... (más callbacks para otras interacciones, como el predictor de puntos de tu ejemplo)
+#     return {}
 
 # 5. Ejecuta la aplicación
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8050) # debug=True es útil para desarrollo
+    # Para Colab/Kaggle con JupyterDash:
+    # app.run_server(mode='inline', port=8050)
+    # Para ejecución local estándar:
+    app.run_server(debug=True, port=8050)
 ```
 
-**Explicación del código Dash:**
-
-* **`app = dash.Dash(...)`**: Crea la instancia de la aplicación Dash. `external_stylesheets` es útil para aplicar estilos globales.
-* **`app.layout`**: Aquí defines la estructura HTML de tu página.
-    * `dbc.Container`, `dbc.Row`, `dbc.Col`: Componentes de `dash-bootstrap-components` para un diseño responsivo basado en rejilla.
-    * `html.H1`, `html.Div`, `html.P`: Equivalentes a etiquetas HTML.
-    * `dcc.Tabs`, `dcc.Tab`: Para organizar contenido en pestañas.
-    * `dcc.Graph`: Para mostrar gráficos de Plotly.
-    * `dcc.Dropdown`: Un menú desplegable interactivo.
-    * `dash_table.DataTable`: Para mostrar tablas de datos interactivas.
-* **`@app.callback(...)`**: El decorador que define la interactividad.
-    * `Output('id-componente-salida', 'propiedad-a-actualizar')`: Especifica qué componente y qué propiedad de ese componente se actualizará.
-    * `[Input('id-componente-entrada', 'propiedad-a-escuchar')]`: Especifica qué componente y propiedad activarán el callback. Puede haber múltiples Inputs.
-    * La función debajo del decorador recibe los valores de los Inputs como argumentos y debe retornar el valor para la Output.
-* **`app.run_server(debug=True)`**: Inicia el servidor de desarrollo de Dash.
+**Explicación del código Dash:** (Se mantiene igual que antes)
+* **`app = dash.Dash(...)`**: Crea la instancia de la aplicación Dash.
+* **`app.layout`**: Define la estructura HTML.
+* **`@app.callback(...)`**: Define la interactividad.
+* **`app.run_server(debug=True)`**: Inicia el servidor.
 
 ### 4.4. Construyendo con Streamlit
 
@@ -280,43 +333,39 @@ import pandas as pd
 import plotly.express as px
 # Importa joblib y otras bibliotecas si las necesitas
 
-# Configuración de la página (opcional, pero bueno para el título y layout)
 st.set_page_config(page_title="Mi Dashboard Streamlit", layout="wide")
 
-# 1. Carga y prepara tus datos (ej. df, model_data, results_df)
-# Usa @st.cache_data para funciones que cargan datos y retornan objetos serializables (como DataFrames)
 @st.cache_data
 def cargar_datos_principales():
-    # df_streamlit = pd.read_csv('tus_datos.csv')
-    # return df_streamlit
-    return pd.DataFrame() # Placeholder
+    try:
+        # df_streamlit = pd.read_csv('tus_datos.csv') # Asegúrate que la ruta es correcta
+        # return df_streamlit
+        return pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]}) # Placeholder si no hay datos
+    except FileNotFoundError:
+        st.error("Archivo de datos no encontrado. Verifica la ruta.")
+        return pd.DataFrame() # Retorna un DataFrame vacío en caso de error
 
-# Usa @st.cache_resource para funciones que retornan objetos no serializables (como conexiones a BD o modelos)
-@st.cache_resource
-def cargar_modelos():
-    # trained_models_st, model_features_st = None, None # Carga tus modelos aquí
-    # try:
-    #     trained_models_st = joblib.load('ruta/a/tus/modelos.pkl')
-    #     model_features_st = joblib.load('ruta/a/tus/features_modelo.pkl')
-    # except FileNotFoundError:
-    #     st.error("Archivos de modelo no encontrados.")
-    # return trained_models_st, model_features_st
-    return None, None # Placeholder
+# @st.cache_resource # Descomentar si cargas modelos
+# def cargar_modelos():
+#     try:
+#         # trained_models_st = joblib.load('ruta/modelos.pkl')
+#         # model_features_st = joblib.load('ruta/features.pkl')
+#         # return trained_models_st, model_features_st
+#         return None, None # Placeholder
+#     except FileNotFoundError:
+#         st.error("Archivos de modelo no encontrados.")
+#         return None, None
 
 df_streamlit = cargar_datos_principales()
-# trained_models_st, model_features_st = cargar_modelos() # Descomentar si usas modelos
+# trained_models_st, model_features_st = cargar_modelos()
 
-# 2. Título Principal de la Aplicación
 st.title("Título de mi Dashboard con Streamlit")
 
-# 3. Crear Pestañas (Tabs)
 tab1, tab2 = st.tabs(["Vista General de Datos", "Análisis Detallado"])
 
 with tab1:
     st.header("Vista General de Datos")
-
     if not df_streamlit.empty:
-        # Organizar en columnas
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("Estadísticas Descriptivas")
@@ -324,72 +373,47 @@ with tab1:
         with col2:
             st.subheader("Muestra de Datos")
             st.dataframe(df_streamlit.head())
-
-        st.subheader("Gráfico de Histograma")
-        # Asumiendo que df_streamlit tiene al menos una columna
-        fig_hist = px.histogram(df_streamlit, x=df_streamlit.columns[0], title='Histograma de Ejemplo')
-        st.plotly_chart(fig_hist, use_container_width=True)
+        if df_streamlit.columns.any(): # Verifica si hay columnas antes de graficar
+            st.subheader("Gráfico de Histograma")
+            fig_hist = px.histogram(df_streamlit, x=df_streamlit.columns[0], title='Histograma de Ejemplo')
+            st.plotly_chart(fig_hist, use_container_width=True)
     else:
         st.warning("No hay datos para mostrar en la vista general.")
 
 with tab2:
     st.header("Análisis Detallado")
-    if not df_streamlit.empty:
+    if not df_streamlit.empty and df_streamlit.columns.any():
         st.subheader("Selector Interactivo")
-        # Crear un selector (selectbox)
         columna_seleccionada_st = st.selectbox(
             "Selecciona una columna para el gráfico:",
             options=df_streamlit.columns,
-            index=0 # Columna por defecto
+            index=0
         )
-
         if columna_seleccionada_st:
-            # Ejemplo: Gráfico de dispersión contra otra columna o un índice
             segunda_columna = df_streamlit.columns[1] if len(df_streamlit.columns) > 1 else None
             if segunda_columna:
                 fig_scatter_st = px.scatter(df_streamlit, x=columna_seleccionada_st, y=segunda_columna,
                                          title=f'{columna_seleccionada_st} vs {segunda_columna}')
                 st.plotly_chart(fig_scatter_st, use_container_width=True)
-            else:
+            else: # Si solo hay una columna o no se puede hacer scatter
                 st.write(f"Datos de la columna: {columna_seleccionada_st}")
                 st.dataframe(df_streamlit[[columna_seleccionada_st]])
-
     else:
         st.warning("No hay datos para el análisis detallado.")
 
-# Ejemplo de sección de predicción (similar a tu app)
-# st.sidebar.header("Predecir Algo") # Ejemplo de uso del sidebar
-# with st.sidebar: # Los inputs pueden ir en el sidebar o en el cuerpo principal
-#     st.subheader("Inputs para Predicción")
-#     input_val1 = st.number_input("Valor 1:", value=0.0)
-#     input_val2 = st.number_input("Valor 2:", value=0.0)
-#     # ... más inputs
-
-#     if st.button("Predecir"):
-#         if trained_models_st and model_features_st:
-#             # input_data_pred = pd.DataFrame({...}) # Prepara tus datos de entrada
-#             # ... (lógica de predicción) ...
-#             # st.success(f"Predicción: {resultado_prediccion}")
-#             st.info("Funcionalidad de predicción no implementada completamente en este ejemplo.")
-#         else:
-#             st.error("Modelos no cargados para la predicción.")
-
-# Para ejecutar esta app, guarda el código como app_streamlit.py y corre en la terminal:
-# streamlit run app_streamlit.py
+# Para ejecutar esta app:
+# 1. Guarda el código como app_streamlit.py
+# 2. Abre tu terminal en el directorio del archivo
+# 3. Ejecuta: streamlit run app_streamlit.py
+# Si usas Colab/Kaggle, necesitarás ngrok para exponer el servidor Streamlit.
 ```
 
-**Explicación del código Streamlit:**
-
-* **`st.set_page_config(...)`**: Configura metadatos de la página. Es bueno llamarlo al inicio.
-* **`@st.cache_data` y `@st.cache_resource`**: Decoradores para optimizar el rendimiento almacenando en caché los resultados de funciones. `cache_data` es para datos (como DataFrames) y `cache_resource` para recursos (como modelos o conexiones a bases de datos).
-* **`st.title()`, `st.header()`, `st.subheader()`, `st.write()`, `st.markdown()`**: Funciones para mostrar texto con diferentes formatos.
-* **`st.tabs()`**: Crea pestañas para organizar el contenido.
-* **`st.columns()`**: Divide la pantalla en columnas.
-* **`st.dataframe()`**: Muestra un DataFrame de Pandas.
-* **`st.plotly_chart()`**: Muestra un gráfico de Plotly.
-* **`st.selectbox()`**: Crea un menú desplegable. Otros widgets comunes son `st.slider()`, `st.text_input()`, `st.number_input()`, `st.button()`.
-* **Flujo de Ejecución:** Streamlit ejecuta el script de arriba a abajo. Cuando un usuario interactúa con un widget (por ejemplo, cambia la selección en un `st.selectbox`), el script se vuelve a ejecutar completo. Streamlit es inteligente al actualizar solo las partes necesarias de la interfaz.
-* **`st.session_state` (no mostrado en detalle arriba, pero presente en tu ejemplo):** Permite almacenar variables entre re-ejecuciones del script, útil para mantener el estado de la aplicación de forma más explícita si es necesario.
+**Explicación del código Streamlit:** (Se mantiene igual que antes)
+* **`st.set_page_config(...)`**: Configura metadatos de la página.
+* **`@st.cache_data`, `@st.cache_resource`**: Decoradores para optimizar.
+* **`st.title()`, `st.header()` etc.**: Funciones para mostrar texto.
+* **`st.tabs()`, `st.columns()`**: Para layout.
+* **Widgets como `st.selectbox()`**: Para interactividad.
 
 ## 5. Ejecutando y Desplegando tu Aplicación
 
@@ -400,7 +424,7 @@ Una vez que has escrito el código de tu dashboard, necesitas ejecutarlo para ve
 * **Para Dash:**
     1.  Abre tu terminal o línea de comandos.
     2.  Navega al directorio donde guardaste tu archivo `app_dash.py`.
-    3.  Asegúrate de que tu entorno virtual esté activado.
+    3.  Asegúrate de que tu entorno virtual (sección [4.1](#41-pasos-iniciales-para-ambos-frameworks---trabajo-en-modo-local)) esté activado.
     4.  Ejecuta el comando:
         ```bash
         python app_dash.py
@@ -410,7 +434,7 @@ Una vez que has escrito el código de tu dashboard, necesitas ejecutarlo para ve
 * **Para Streamlit:**
     1.  Abre tu terminal o línea de comandos.
     2.  Navega al directorio donde guardaste tu archivo `app_streamlit.py`.
-    3.  Asegúrate de que tu entorno virtual esté activado.
+    3.  Asegúrate de que tu entorno virtual (sección [4.1](#41-pasos-iniciales-para-ambos-frameworks---trabajo-en-modo-local)) esté activado.
     4.  Ejecuta el comando:
         ```bash
         streamlit run app_streamlit.py
@@ -421,18 +445,17 @@ Una vez que has escrito el código de tu dashboard, necesitas ejecutarlo para ve
 
 Compartir tu aplicación localmente está bien para desarrollo, pero para que otros la usen, necesitas desplegarla en un servidor.
 
-#### **Streamlit Community Cloud (Para Apps Streamlit)**
+#### 5.2.1. Streamlit Community Cloud (Para Apps Streamlit)
 
 Streamlit ofrece una forma increíblemente sencilla de desplegar aplicaciones públicas de forma gratuita a través de Streamlit Community Cloud.
 
 **Requisitos:**
 
 1.  Tu código de Streamlit (`app_streamlit.py`).
-2.  Un archivo `requirements.txt` que liste todas las dependencias de Python de tu proyecto. Puedes generarlo con:
+2.  Un archivo `requirements.txt` que liste todas las dependencias de Python de tu proyecto. Puedes generarlo con (asegúrate que tu entorno virtual esté activado):
     ```bash
     pip freeze > requirements.txt
     ```
-    (Asegúrate de que tu entorno virtual esté activado y solo contenga las dependencias necesarias para este proyecto).
 3.  Tu proyecto debe estar en un repositorio público de GitHub.
 
 **Pasos:**
@@ -446,34 +469,59 @@ Streamlit ofrece una forma increíblemente sencilla de desplegar aplicaciones p�
 
 ¡Y eso es todo! Streamlit construirá y desplegará tu aplicación, proporcionándote una URL pública para compartirla.
 
-#### **Ngrok (Para Exponer Apps Locales Temporalmente - Útil para Dash)**
+#### 5.2.2. Ngrok (Para Exponer Apps Locales/Cloud Temporalmente)
 
-Ngrok es una herramienta que crea un túnel seguro desde una URL pública en internet hacia tu servidor local. Es útil para demostraciones rápidas o pruebas, pero la URL gratuita es temporal.
+Ngrok es una herramienta que crea un túnel seguro desde una URL pública en internet hacia tu servidor local (o un servidor corriendo en Colab/Kaggle). Es útil para demostraciones rápidas o pruebas, pero la URL gratuita es temporal.
 
-**Cómo usar Ngrok (ejemplo con una app Dash corriendo en el puerto 8050):**
+**Cómo usar Ngrok (ejemplo con una app Dash corriendo en el puerto 8050 localmente):**
 
 1.  **Descarga Ngrok:** Ve a [ngrok.com](https://ngrok.com/download) y descarga la versión para tu sistema operativo.
-2.  **Descomprime y configura:** Sigue las instrucciones en su sitio para configurar tu token de autenticación (opcional para uso básico, pero recomendado).
-3.  **Ejecuta tu aplicación Dash localmente:** `python app_dash.py`. Asegúrate de que esté corriendo (por ejemplo, en `http://127.0.0.1:8050`).
+2.  **Descomprime y configura:** Sigue las instrucciones en su sitio para configurar tu token de autenticación.
+3.  **Ejecuta tu aplicación localmente:** `python app_dash.py` (para Dash) o `streamlit run app_streamlit.py --server.port 8501` (para Streamlit, especificando un puerto si es necesario).
 4.  **Abre otra terminal y ejecuta Ngrok:**
     Si tu app Dash corre en el puerto 8050:
     ```bash
-    # Si ngrok está en tu PATH
     ngrok http 8050
-    # Si no, navega a la carpeta donde está ngrok y ejecuta:
-    # ./ngrok http 8050 (macOS/Linux)
-    # ngrok.exe http 8050 (Windows)
     ```
-5.  **Ngrok te mostrará una URL pública** (algo como `https://randomstring.ngrok.io`). Cualquiera con esta URL podrá acceder a tu aplicación Dash mientras Ngrok y tu servidor local sigan corriendo.
+    Si tu app Streamlit corre en el puerto 8501:
+    ```bash
+    ngrok http 8501
+    ```
+5.  **Ngrok te mostrará una URL pública** (algo como `https://randomstring.ngrok.io`). Cualquiera con esta URL podrá acceder a tu aplicación mientras Ngrok y tu servidor local/cloud sigan corriendo.
 
-**Consideraciones sobre Ngrok:**
+**Para usar Ngrok en Google Colab/Kaggle:**
+Primero, instala ngrok en el notebook:
+```python
+!pip install pyngrok
+```
+Luego, configura y expón tu app (ejemplo para Streamlit corriendo en el puerto 8501 por defecto):
+```python
+from pyngrok import ngrok
 
-* La URL pública cambia cada vez que reinicias Ngrok (en la versión gratuita).
-* Es para exposición temporal, no para un alojamiento permanente de producción.
+# Termina cualquier túnel ngrok activo (si lo hay)
+ngrok.kill()
 
-#### **Otras Opciones de Despliegue (Más Avanzadas):**
+# Configura tu authtoken de ngrok (reemplaza con tu token)
+NGROK_AUTH_TOKEN = "TU_AUTHTOKEN_DE_NGROK"
+ngrok.set_auth_token(NGROK_AUTH_TOKEN)
 
-Para un despliegue más robusto y permanente, especialmente para aplicaciones Dash o aplicaciones Streamlit que no quieras alojar en Streamlit Community Cloud, puedes considerar plataformas como:
+# Abre un túnel HTTP al puerto donde corre tu app Streamlit/Dash
+# Asegúrate que tu app Streamlit/Dash se está ejecutando en segundo plano en este puerto
+# Para Streamlit, puedes correrlo en una celda y luego ejecutar esto:
+# !streamlit run app_streamlit.py & # El '&' lo corre en segundo plano
+# public_url = ngrok.connect(8501) # Para Streamlit
+# print(f"URL pública de Ngrok: {public_url}")
+
+# Para Dash (ejecutado con app.run_server(port=8050)):
+# !python app_dash.py &
+# public_url = ngrok.connect(8050) # Para Dash
+# print(f"URL pública de Ngrok: {public_url}")
+```
+**Nota:** Ejecutar aplicaciones web de esta manera en notebooks puede ser un poco complejo por el manejo de procesos en segundo plano.
+
+#### 5.2.3. Otras Opciones de Despliegue (Más Avanzadas):**
+
+Para un despliegue más robusto y permanente, considera plataformas como:
 
 * **Heroku:** Popular para desplegar aplicaciones Python.
 * **PythonAnywhere:** Específico para Python, fácil para principiantes.
@@ -481,7 +529,7 @@ Para un despliegue más robusto y permanente, especialmente para aplicaciones Da
 * **Google Cloud Platform (GCP):** App Engine, Cloud Run, Compute Engine.
 * **Microsoft Azure:** App Service, Virtual Machines.
 
-Estas plataformas generalmente requieren más configuración (por ejemplo, configurar un servidor WSGI como Gunicorn para Dash) pero ofrecen más control y escalabilidad.
+Estas plataformas generalmente requieren más configuración pero ofrecen más control y escalabilidad.
 
 ## 6. Conclusión
 
