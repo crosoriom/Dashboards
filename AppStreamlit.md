@@ -1,6 +1,7 @@
 # Documentación: Dashboard de Análisis de Estadísticas de Jugadores de la NBA (Streamlit)
 
 Este documento detalla la estructura y funcionamiento de la aplicación Streamlit desarrollada para analizar y predecir estadísticas de jugadores de la NBA, basada en el archivo `streamlit_app.py`.
+Puedes ver la app funcional en este [enlace](https://dashboardfortestingframeworks.streamlit.app/).
 
 ## 1. Visión General
 
