@@ -537,7 +537,5 @@ Estas plataformas generalmente requieren más configuración pero ofrecen más c
 
 Recuerda que la práctica es clave. Comienza con proyectos pequeños, experimenta con los diferentes componentes y explora la documentación oficial de [Dash](https://dash.plotly.com/) y [Streamlit](https://streamlit.io/) para descubrir funcionalidades más avanzadas.
 
-El contenido específico de tu dashboard (como el análisis de estadísticas de la NBA) es solo un ejemplo. Puedes aplicar estas herramientas a cualquier conjunto de datos o problema que requiera visualización e interacción.
-
 ¡Mucha suerte en tu viaje de creación de dashboards!
 
