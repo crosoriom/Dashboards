@@ -118,7 +118,7 @@ Para ejecutar este dashboard localmente:
 4.  Ejecuta el comando: `python dash_app.py`
 5.  Abre tu navegador web y ve a `http://127.0.0.1:8050/`.
 
-
+## Código de la aplicación
 ```python
 import dash
 from dash import dcc, html, Input, Output, dash_table, State # State fue importado implicitamente antes, ahora explícito
