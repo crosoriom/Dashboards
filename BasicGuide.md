@@ -317,7 +317,7 @@ if __name__ == '__main__':
     app.run_server(debug=True, port=8050)
 ```
 
-**Explicación del código Dash:** (Se mantiene igual que antes)
+**Explicación del código Dash:**
 * **`app = dash.Dash(...)`**: Crea la instancia de la aplicación Dash.
 * **`app.layout`**: Define la estructura HTML.
 * **`@app.callback(...)`**: Define la interactividad.
@@ -408,7 +408,7 @@ with tab2:
 # Si usas Colab/Kaggle, necesitarás ngrok para exponer el servidor Streamlit.
 ```
 
-**Explicación del código Streamlit:** (Se mantiene igual que antes)
+**Explicación del código Streamlit:**
 * **`st.set_page_config(...)`**: Configura metadatos de la página.
 * **`@st.cache_data`, `@st.cache_resource`**: Decoradores para optimizar.
 * **`st.title()`, `st.header()` etc.**: Funciones para mostrar texto.
