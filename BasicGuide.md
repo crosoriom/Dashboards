@@ -125,7 +125,7 @@ La sección [4.1](#41-pasos-iniciales-para-ambos-frameworks---trabajo-en-modo-lo
         pip install dash dash-bootstrap-components
         # Para Streamlit
         pip install streamlit
-        # Para modelos (opcional, basado en tus ejemplos)
+        # Para modelos
         pip install scikit-learn joblib
         ```
 
@@ -143,7 +143,7 @@ La sección [4.1](#41-pasos-iniciales-para-ambos-frameworks---trabajo-en-modo-lo
             print("Asegúrate de que el archivo 'tus_datos.csv' exista.")
             # Manejar el error apropiadamente
         ```
-    * Realiza cualquier limpieza, transformación o preprocesamiento necesario. Tus ejemplos usan un script `RenameDatabase.py`, lo que indica que este es un paso importante.
+    * Realiza cualquier limpieza, transformación o preprocesamiento necesario.
 
 3.  **Cargar Modelos (Si Aplica):**
     Si tu dashboard incluye predicciones de modelos de machine learning, cárgalos.
@@ -471,7 +471,7 @@ Streamlit ofrece una forma increíblemente sencilla de desplegar aplicaciones p�
 
 #### 5.2.2. Ngrok (Para Exponer Apps Locales/Cloud Temporalmente)
 
-Ngrok es una herramienta que crea un túnel seguro desde una URL pública en internet hacia tu servidor local (o un servidor corriendo en Colab/Kaggle). Es útil para demostraciones rápidas o pruebas, pero la URL gratuita es temporal.
+[Ngrok](https://ngrok.com/) es una herramienta que crea un túnel seguro desde una URL pública en internet hacia tu servidor local (o un servidor corriendo en Colab/Kaggle). Es útil para demostraciones rápidas o pruebas, pero la URL gratuita es temporal.
 
 **Cómo usar Ngrok (ejemplo con una app Dash corriendo en el puerto 8050 localmente):**
 
